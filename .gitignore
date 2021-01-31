@@ -1,0 +1,8 @@
+*.html
+*.Rproj
+*.zip
+*.xlsx
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata

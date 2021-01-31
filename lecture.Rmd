@@ -1,0 +1,403 @@
+---
+title: "Munge"
+author: "Andy Choens"
+date: "Week 03"
+output: 
+  html_notebook:
+    toc: true
+    toc_float:
+      toc_collapsed: true
+    toc_depth: 3
+    number_sections: true
+    theme: cerulean
+---
+
+
+
+# Tonight
+
+- Data Life Cycle
+- Last Week Tonight
+    - Some `mpg` talk
+    - A ggplot review
+- Intro To Data Munging
+
+
+
+# Data Life Cycle
+
+```{r echo=false, fig.align='center'}
+url <- "https://d33wubrfki0l68.cloudfront.net/571b056757d68e6df81a3e3853f54d3c76ad6efc/32d37/diagrams/data-science.png"
+knitr::include_graphics(url)
+```
+
+- Last week, an introduction to data viz.
+- This week, an introduction data munging (Tidy/Transform) & some data viz.
+- Next week, more data viz and more data munging.
+
+**BIG IDEA:** The data you have is ALMOST NEVER the data you want.
+
+
+# Last Week Tonight
+
+```{r}
+library(tidyverse)
+data(mpg)
+mpg
+```
+
+- The grain of the `mpg` data is car model.
+    - Each row is a different model.
+    - Brands span many rows.
+    - Years span many rows.
+    - We have data about the car model, but not about individual cars.
+- So what?
+    - This data tells us something about the mileage of car models for sale.
+    - It tells us nothing about the mileage of cars actually sold.
+    - It tells us nothing, really, of mileage of cars on the road.
+    
+For example:
+
+```{r}
+mpg %>% filter(manufacturer == "chevrolet")
+```
+We cannot compare the number of Suburbans sold to the number of Malibus sold.
+
+But, we can learn about this data set itself.
+
+```{r}
+ggplot(data = mpg, aes(x = class)) + 
+   geom_bar(aes(y = 100*(..count..)/sum(..count..)), fill = "darkred") +
+   ylim(0, 100)
+```
+A bit more complicated than what your lab, but you should recognize it by now. 
+There are three parts:
+
+1. `ggplot(data = mpg, aes(x = class)) + ` DEFINES THE DATA
+2. `geom_bar(aes(y = 100*(..count..)/sum(..count..)), fill = "darkred") +` DEFINES WHAT
+3. `ylim(0, 100)` EXTRA JAZZ
+
+This plot shows PERCENTS, not COUNTS. Thus, it is appropriate for it to show the
+full range of possible percents (0 - 100). Be very careful looking at a graph
+showing percents that doesn't show you where 0 and 100 are relative to the data
+shown. If they don't show you that, assume you are being manipulated (or the
+analyst is a amateur).
+
+
+
+# Some 2020 DAta
+
+OK, that data set is cute, but can we get more data, newer data?
+
+YES WE CAN! [https://www.fueleconomy.gov/](https://www.fueleconomy.gov/)
+
+The US Federal Government publishes annual estimates for the mileage of 
+cars sold in the US each year.
+
+- You do not need to download this data. I did that for you and I added it here.
+- You may, if you are interested, look at the [script I wrote](./data/get_mpg.R).
+- If you want to look yourself, at the bottom of the page, "Download EPA's MPG Ratings"
+
+## Column Headers
+
+If you looked at the script, you know I simplified the column names to make them
+easier to use in R. However, my column names necessarily lose some detail. Therefore,
+to preserve the original full detail:
+
+```{r}
+## This tibble show us my shortened column name next to the original full
+## column name. Don't worry aout this code. I'm providing this to make your
+## life easier.
+tibble(ColName = names(mpg2020), Original = attributes(mpg2020)$label)
+```
+
+Above, we drew a bar plot of car class. The equivalent plot, with this data set
+would be:
+
+```{r}
+## Differences:
+## - I rotated the graph to make the class names easier to read.
+## - The column name used is different.
+## - There are more classes in this data set, so that's neat.
+ggplot(data = mpg2020, aes(y = CarlineClassDesc)) + 
+   geom_bar(aes(x = 100*(..count..)/sum(..count..)), fill = "darkred") +
+   xlim(0, 100)
+```
+
+This data set has everything in the original mpg data, but it is newer and, 
+well, more. But, how can we:
+
+- Draw this plot, for Chevrolets only?
+- Calculate the mileage, for Standard Pick-ups?
+- Figure out which manufacturer has the most models for sale?
+- Figure out who sold the most cars. (Oops, you can't do that with this data!)
+
+The data needed to answer these AND MANY OTHER questions are here, but we cannot
+easily do this without first transforming (munging) the data. And this is a real
+data set and you can imagine real questions that could be answered with it, but
+to do so, we must be able to transform the data
+
+
+# DATA MUNGING
+
+Let me encourage you to read/watch:
+
+- [R4DS: Data Transformation](http://r4ds.had.co.nz/transform.html)
+- [dplyr intro | Data manipulation in R](https://www.youtube.com/watch?v=rm0BQSWoJlc)
+
+We transform data using a series of verbs from the dplyr package (part of the 
+Tidyverse). Each very performs a specific data transformation step.
+
+- Filter: Only keep the rows of data that you need for the analysis. For 
+  example, we could use this function to drop all rows not made by Chevrolet.
+    - Function: `filter()`
+    - ==
+    - <, <=, >, >=
+    - is.na()
+    - !
+- Get Summary Stats: Provide summary statistics such as the average value of a
+  column, or the number of lines in the data set.
+    - Function: `summarize()`
+    - min/max
+    - mean/sd
+    - n
+- Group: Group, or stratify our results by a column. This is similar to
+  `facet_wrap()` we learned about last week, but more flexible.
+    - Function: `group_by()`
+- Sort: Sort, or arrange, the results by the values in column.
+    - Function: `arrange()`
+    - By default, returns are sorted in ascending order.
+    - `desc()` Returns can be sorted in descending order.
+
+```{r}
+url <- "https://upload.wikimedia.org/wikipedia/en/b/bd/ThePlaneteers.JPG"
+knitr::include_graphics(url)
+```
+
+With their powers combined, we can perform many interestng transformations of
+our data, to answer questions the original data cannot answer.
+
+We will learn about other data transofrmations in the coming weeks. This is
+enough to get us started doing something interesting.
+
+## Filter
+
+Uses Boolean logic to filter our data.
+
+- ==
+- <, <=, >, >=
+- is.na()
+- !
+
+```{r}
+chevies <- filter(mpg2020, Division == "Chevrolet")
+chevies
+```
+
+In case you didn't realize this, General Motors owns/manufacturers Chevrolet 
+and several car brands such as Cadillac & GMC.
+
+```{r}
+paste("Number Rows mpg2020:", nrow(mpg2020))
+paste("Number Rows chevies:", nrow(chevies))
+```
+
+We can look at cars with 4 cylinders.
+
+```{r}
+four_cylinders <- filter(mpg2020, NCyl == 4)
+four_cylinders
+```
+
+Or cars with less than 6 cylinders!
+
+```{r}
+lt_six_cylinders <- filter(mpg2020, NCyl < 6)
+lt_six_cylinders
+```
+
+In case you didn't realize this, there many different kinds of Honda Civic. We
+can find them all without having to know the Carline name for each!
+
+```{r}
+civics <- filter(mpg2020, str_detect(Carline, "CIVIC"))
+civics
+```
+
+And, this isn't just academic. Perhaps I want to see a density plot of Honda
+Civic city gas mileage.
+
+```{r}
+ggplot(civics, aes(x = City)) + geom_density(color = "darkgreen") 
+```
+
+This differs from the over-all dramatically!
+
+```{r}
+ggplot(mpg2020, aes(x = City)) + geom_density(color = "darkred") 
+```
+
+Some take-aways:
+
+1. How do you get a Honda Civic that can only get 22/23 mpg in the city?
+2. PLEASE observer how these two graphs peak in very different places!
+3. The first parameter in the filter command AND the ggplot command is data.
+
+## Summarize
+
+- Function: `summarize()`
+- min/max
+- mean/sd
+- n
+
+A summary statistic, hence summarize, is a single number that tells us something
+about the data in that column.
+
+```{r}
+summarize(civics,
+          N = n(),
+          CityAvg = mean(City),
+          CitySD = sd(City),
+          CityMin = min(City),
+          CityMax = max(City))
+```
+
+Does this make sense, in the context of our data set and density plot above?
+
+## Group By
+
+Stratify the results of a summarize by another variable. Every year, this gives
+students a hard time. So here's an example I hope helps.
+
+- Function: `group_by()`
+
+```{r}
+grouped_civics <- group_by(civics, Carline)
+summarize(grouped_civics,
+          N = n(),
+          CityAvg = mean(City),
+          CitySD = sd(City),
+          CityMin = min(City),
+          CityMax = max(City))
+```
+
+Wait, seriously? There's a five-door Civic?
+
+- The function `group_by` creates a grouped data set which is nearly 
+  indistinguishable from an un-grouped data set.
+- This command is not useful on it's own.
+- It is very useful when combined with summarize because a grouped data set
+  summarizes differently than an un-grouped data set.
+- Again, notice how the data set is ALWAYS the first parameter.
+    - There must be some reason I keep harping on this. . . . 
+  
+```{r}
+## The only differentiating feature is the part that says Groups: Carline [3]
+grouped_civics
+```
+  
+As you can probably imagine, if you do this a bunch, you wind up with a bunch of
+awkwardly named data sets. I've got six or seven going now, and I'm just messing
+around.
+
+Fortunately, there is a better way! Pipes!
+
+```{r}
+civics %>%
+   group_by(Carline) %>%
+   summarize(
+          N = n(),
+          CityAvg = mean(City),
+          CitySD = sd(City),
+          CityMin = min(City),
+          CityMax = max(City))
+```
+
+This is EXACTLY the same as what we did above, but we did it in a single step.
+The pipe symbol `%>%` "pipes" the output from one function to the input of the
+next function and works when the first parameter of the function is the data.
+
+That's why I kept pointing this out. We can do all sorts of piping!
+
+```{r}
+easy_summary_civics <- 
+   mpg2020 %>%
+   filter(str_detect(Carline, "CIVIC")) %>%
+   group_by(Carline) %>%
+   summarize(
+          N = n(),
+          CityAvg = mean(City),
+          CitySD = sd(City),
+          CityMin = min(City),
+          CityMax = max(City))
+easy_summary_civics
+```
+
+Thanks to the pip operator, we can avoid creating a million data-step data sets.
+This is kinda-sorta available in SAS, but it is not taught as a best practice.
+In modern R programming, using the pipe is considered best practice and is how
+this stuff gets taught.
+
+## Arrange
+
+After performing one or more data transformations, R will return our data to us
+in alphabetical order, based on the first column or so. For example, see above.
+
+But, that isn't ALWAYS how we want it.
+
+- Function: `arrange()`
+- By default, returns are sorted in ascending order.
+- `desc()` Returns can be sorted in descending order.
+
+```{r}
+easy_summary_civics %>% arrange(CityAvg)
+easy_summary_civics %>% arrange(desc(CityAvg))
+```
+
+This function is a useful function on your labs!!!!!! For example, say I ask a
+question like this:
+
+> Task X: Which Car in mpg2020 has the HIGHEST highway gas mileage?
+
+So, there are over 1,000 rows in mpg2020. I don't think you want to go searching
+through that by hand. In fact, I KNOW you don't. (If you do, let's talk after 
+class.)
+
+Fortunately, arrange makes it easy.
+
+```{r}
+mpg2020 %>% arrange(desc(Hwy)) %>% slice(5)
+```
+
+
+# Using Data Responsibly 
+
+Always look for documentation to help you understand the: 
+
+- content of the data (columns)
+- sampling/inclusion/exclusion criteria (as relevant/appropriate)
+- how much data is there (this goes back to 1978)
+- caveats, changes in the data over time.
+- Any aggregations we can use to validate our analyses.
+
+For example, this data does NOT include EVERY vehicle sold in the US. From the
+PDF documentation on the EPA website, we can see that some vehicles are exempt.
+
+Light-duty fuel economy regulations do not apply to:
+
+- Sport utility vehicles (SUVs) and passenger vans with a gross vehicle weight
+  rating (GVWR) of more than 10,000 pounds—GVWR is the vehicle weight plus
+  carrying capacity
+- Other vehicles with a GVWR of 8,500 pounds or more or a curb weight over
+  6,000 pounds. Therefore, manufacturers do not have to estimate their fuel 
+  economy, and fuel economy labels are not posted on their windows. Also, fuel 
+  economy information on some vehicles was not available in time to be included 
+  in this guide. More up-to-date information can be found at fueleconomy.gov.
+
+This exclusion is neither "right" nor "wrong", but it does bias the data. There
+are reasons the EPA does this. You may or may not agree with these reasons. My 
+point is simple - you need to be aware of these kinds of exclusions and biases.
+If you don't look for this information, you are using the data irresponsibly.
+
+
+https://www.caranddriver.com/features/a15388892/the-truth-about-epa-city-highway-mpg-estimates/
