@@ -1,0 +1,203 @@
+---
+title: "Munge"
+author: "YOUR NAME HERE"
+date: "Week 03"
+output: html_notebook
+---  
+
+
+
+# New York City Airbnb
+
+This lab is based on the New York City Airbnb Open Data from Kaggle. I want you to spend some more time using our data visualization and transformation skills to explore a new data set. Since 2008, guests and hosts have used Airbnb to expand on traveling possibilities and present more unique, personalized way of experiencing the world. This data set describes the listing activity and metrics in NYC, NY for 2019.
+
+## Goals:
+
+- Practice more with ggplot [Data Visualisation](https://r4ds.had.co.nz/data-visualisation.html)
+- First steps with data transformations [Transformations](https://r4ds.had.co.nz/transform.html)
+- Guided EDA [EDA](https://r4ds.had.co.nz/exploratory-data-analysis.html)
+
+```{r}
+url <- "https://imgs.xkcd.com/comics/realistic_criteria.png"
+knitr::include_graphics(url)
+```
+
+# Lab
+
+## Setup
+
+Your first three lab tasks are pretty straight-forward. While not required, starting a new R session will keep your global environment uncluttered. To start a new R session, go to the "Session" entry and then go to "Restart R" which is about half-way down the menu. There is a short-cut you can use of Ctrl+Shift+F10. (Confession, I don't use this short-cut. I can never remember it.)
+
+```{r}
+url <- "./includes/restart-r-session.png"
+knitr::include_graphics(url)
+```
+
+1. Read about the [New York City Airbnb](https://www.kaggle.com/dgomonov/new-york-city-airbnb-open-data/data#) data.
+    - Your first step with any new data set should be to learn as much as you can about the origins, goals, and biases in the data.
+2. Run the following code chunk. This will load the tidyverse package, import the data, and get you set up.
+    - Our data for this lab is stored in a CSV file, but that file is stored inside a ZIP file to make it a bit smaller and easier to move around.
+
+```{r}
+library(tidyverse)
+data_file <- "./data/new-york-city-airbnb-open-data.zip"
+Airbnb <- read_csv(data_file)
+Airbnb
+```
+
+3. Spend a few minutes looking at the data. The "Environment" pane is on the lower right-hand side of the RStudio interface. Click on "Airbnb" to open the data in a new editor tab. This makes it easier to explore
+
+```{r}
+url <- "./includes/rstudio-interface.png"
+knitr::include_graphics(url)
+```
+
+## EDA
+
+Tasks 01 - 03 do not require any additional coding, although they may require you to review the code you ran above. You may "pencil in" an answer here in RStudio, but I do need you to also answer these questions in Canvas.
+
+### Task 01. How many rows of data are in the Airbnb data?
+
+How many rows of data are in the Airbnb data?
+
+
+### Task 02. How many columns are in Airbnb?
+
+How many columns are in Airbnb?
+
+### Task 03. What is the grain of this Airbnb data? 
+In other words, what is a row? In our lectures, we have recently explored the mpg and mpg2020 data sets. Each row in these data sets is a unique car model. So the grain is car model. What is each row of this data "about"? I know, this seems like a weird concept but it is important to understand this, because we are about to start changing the grain of our data.
+
+- For more information about the data, please read the [Kaggle  documentation](https://www.kaggle.com/dgomonov/new-york-city-airbnb-open-data/data#).
+- If you aren't familiar with Airbnb, look at [their website](https://www.airbnb.com).
+- If you want to read more about data graininess, [Data Granularity](https://en.wikipedia.org/wiki/Granularity#Data_granularity)
+
+### Task 04. Draw a bar plot showing the number of Airbnb hosts per `neighbourhood_group`. 
+
+- That incredibly British spelling is a hint . . . . 
+- Use your bar plot to determine which neighborhood has the most hosts?
+
+```{r}
+# Hint, you need to replace ? with the column name.
+ggplot(Airbnb, aes(x = ?)) +
+    geom_bar(fill = "darkblue")
+```
+
+### Task 05. How many hosts are in Queens?
+
+- Don't try to use your bar plot and guess. Transform the data!
+- This will change the grain of the data.
+    
+```{r}
+## Hint: Replace ? with the column name you want to group by!
+Airbnb %>%
+    group_by(?) %>%
+    count()
+```
+
+### Task 06. Which room_type is the most prevalent in the Bronx?
+
+```{r}
+## Hint: Replace ? and ?? with column names.
+## This code chunk produces TWO outputs which you can click on to view.
+Airbnb %>%
+    group_by(?, ??) %>%
+    count()
+
+ggplot(Airbnb, aes(x = ?, y = ??)) +
+    geom_count(fill = "darkblue")
+
+```
+
+### Task 07. What is the average price of a room in Belmont?
+
+```{r}
+## Hint: Finish the filter command. 
+Airbnb %>%
+    filter() %>%
+    summarize(AvgPrice = mean(price))
+```
+
+### Task 08. Do you think the `number_of_reviews` is a good predictor of `price`?
+
+- Create a scatter plot showing the relationship between the two variables.
+- You will want to use `geom_point` in your plot. 
+- Please discuss and upload your graph.
+
+```{r}
+## YOUR CODE HERE!
+
+```
+
+### Task 09. Please discuss and upload your graph
+
+Nothing to code here. Remember, you an save an in-line plot by right-clicking on the picture and using "Save As".
+
+### Task 10. Draw a density plot of host price.
+
+- How would you describe it? Is it normally distributed? Does it have a long tail? Is it skewed?
+- You will need to use `geom_density()` or `geom_histogram()` to answer this question.
+- For more info on [Skewness](https://en.wikipedia.org/wiki/Skewness), I recommend Wikipedia.
+
+```{r}
+## YOUR CODE HERE!
+
+```
+
+### Task 11. Which `room_type` has the most outlier prices? "Entire home/apt" or "Shared room"
+
+The price of Airbnb hosts is obviously all over the place, which is a fun way to say there are many outliers in price. Which `room_type` has the most outliers?
+
+- Entire home/apt
+- Shared room
+
+To answer this question, you can use a box plot (`geom_boxplot()`). If you'd like to read more about box plots, I recommend the [Wikipedia box plot](https://en.wikipedia.org/wiki/Box_plot) article.
+
+```{r}
+## YOUR CODE HERE!
+
+```
+
+
+### Task 12. Please upload the resulting plot to Canvas.
+
+Nothing to code here.
+
+### Task 13. What is the average price of of a "Shared room"?
+
+- This is similar to Task 07.
+- You need to change the grain of the data to answer this question.
+- Fun fact: You could actually answer Task 13 and Task 14 with a single code chunk.
+
+```{r}
+## YOUR CODE HERE!
+
+```
+
+
+### Task 14. How many "Shared room" entries are in the data?
+
+- Again, another data transformation.
+- Fun fact: You could actually answer Task 13 and Task 14 with a single code chunk.
+
+```{r}
+## YOUR CODE HERE!
+
+```
+
+
+### Task 15. Is this a large enough sample to be useful?
+
+Nothing to code here.
+
+All else being equal, a data scientist would rather have more than less data available. But, collecting data isn't free and takes time. Do you think we have enough data about the price of "Shared Rooms" to properly estimate it's cost in NYC?
+
+### Task 16. Predicting Price
+
+Soon we will start thinking about building a linear model to predict Airbnb host price in NYC. Use your transformation/plotting skills to look at the data. Which features (columns) do you think would be most useful for predicting price? Describe what you find in Canvas. You can choose to use data transformation(s), plot(s), or a combination of both. Feel free to create additional code chunks if that is helpful to you.
+
+```{r}
+## YOUR CODE HERE!
+
+```
+
