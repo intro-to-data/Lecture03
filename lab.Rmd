@@ -65,10 +65,11 @@ How many rows of data are in the Airbnb data?
 
 How many columns are in Airbnb?
 
-### Task 03. What is the grain of this Airbnb data? 
+### Task 03. What is the grain of this Airbnb data?
+
 In other words, what is a row? In our lectures, we have recently explored the mpg and mpg2020 data sets. Each row in these data sets is a unique car model. So the grain is car model. What is each row of this data "about"? I know, this seems like a weird concept but it is important to understand this, because we are about to start changing the grain of our data.
 
-- For more information about the data, please read the [Kaggle  documentation](https://www.kaggle.com/dgomonov/new-york-city-airbnb-open-data/data#).
+- For more information about the data, please read the [Kaggle documentation](https://www.kaggle.com/dgomonov/new-york-city-airbnb-open-data/data#).
 - If you aren't familiar with Airbnb, look at [their website](https://www.airbnb.com).
 - If you want to read more about data graininess, [Data Granularity](https://en.wikipedia.org/wiki/Granularity#Data_granularity)
 
@@ -97,9 +98,10 @@ Airbnb %>%
 
 ### Task 06. Which room_type is the most prevalent in the Bronx?
 
+- This code chunk produces TWO outputs which you can click on to view.
+
 ```{r}
 ## Hint: Replace ? and ?? with column names.
-## This code chunk produces TWO outputs which you can click on to view.
 Airbnb %>%
     group_by(?, ??) %>%
     count()
