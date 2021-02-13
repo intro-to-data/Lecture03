@@ -38,6 +38,8 @@ knitr::include_graphics(url)
 2. Run the following code chunk. This will load the tidyverse package, import the data, and get you set up.
     - Our data for this lab is stored in a CSV file, but that file is stored inside a ZIP file to make it a bit smaller and easier to move around.
 
+## Setup
+
 ```{r}
 library(tidyverse)
 data_file <- "./data/new-york-city-airbnb-open-data.zip"

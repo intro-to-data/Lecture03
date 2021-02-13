@@ -43,6 +43,8 @@ knitr::include_graphics(url)
 
 # Last Week, Tonight
 
+## Setup
+
 ```{r}
 library(tidyverse)
 data(mpg)
