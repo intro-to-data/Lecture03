@@ -26,7 +26,7 @@ output:
 
 # Data Life Cycle
 
-```{r echo=false, fig.align='center'}
+```{r echo=FALSE, fig.align='center'}
 url <- "https://d33wubrfki0l68.cloudfront.net/571b056757d68e6df81a3e3853f54d3c76ad6efc/32d37/diagrams/data-science.png"
 knitr::include_graphics(url)
 ```
@@ -41,20 +41,71 @@ knitr::include_graphics(url)
 
 
 
-# Last Week, Tonight
+# Setup
 
-## Setup
+- Tonight's data: Fuel Economy 2020
+    - The US Federal Government publishes annual estimates for the mileage of cars  sold in the US each year.
+    - Raw Source: [https://www.fueleconomy.gov/](https://www.fueleconomy.gov/) 
+    - You do not need to download this data. I did that for you and I added it here.
+    - Review the [script I wrote](./data/get_mpg.R).
+    - If you want to look yourself, at the bottom of the page, "Download EPA's MPG Ratings"
+- The data extract we will use is in the `data` folder.
 
-```{r}
+```{r setup, message=FALSE, warning=FALSE}
+## Experiment with what happens if you set message to TRUE.
+rm(list = ls())
+library(knitr)
 library(tidyverse)
-data(mpg)
+mpg <- read_csv("data/mpg2020.csv")
+```
+
+Different ways to review the data:
+
+1. See the data in the notebook as a table.
+2. See the data in the notebook via `glimpse()`.
+3. View the data in RStudio.
+
+The first two options keep the data view in the notebook. The last option separates the data view from the notebook which reduces the value of the notebook as a stand-alone document. But, it is very flexible/useful.
+
+## As a table
+```{r}
+## This gets awkward for wide data sets.
 mpg
 ```
 
-- The grain of the `mpg` data is car model.
+## Via glimpse
+
+```{r}
+## This doesn't show as much, but scales better for wide data sets.
+## In this case, it is quite helpful.
+glimpse(mpg)
+```
+
+## View in RStudio
+
+```{r}
+## Uppercase "V" here is important!
+View(mpg)
+```
+
+
+
+# Last Week, Tonight
+
+## Short guide to ggplot
+
+I hope you all find this graphic useful.
+
+```{r echo=FALSE, fig.align='center'}
+file <- "includes/ggplot flow.drawio.png"
+knitr::include_graphics(file)
+```
+
+## Grain of `mpg`
+
+- The grain of the `mpg` data is car _model_ from 2020.
     - Each row is a different model.
     - Brands span many rows.
-    - Years span many rows.
     - We have data about the car model, but not about individual cars.
 - So what?
     - This data tells us something about the mileage of car models for sale.
@@ -63,86 +114,77 @@ mpg
     
 For example:
 
-```{r}
-mpg %>% filter(manufacturer == "chevrolet")
-```
-We cannot compare the number of Suburbans sold to the number of Malibus sold. But, we can plot what we have.
-
-```{r}
-ggplot(data = mpg, aes(x = class)) + 
-   geom_bar(aes(y = 100*(..count..)/sum(..count..)), fill = "darkred") +
-   ylim(0, 100)
-```
-This should be a little more familiar by now. There are three parts:
-
-1. `ggplot(data = mpg, aes(x = class)) + ` DEFINES THE DATA
-2. `geom_bar(aes(y = 100*(..count..)/sum(..count..)), fill = "darkred") +` DEFINES WHAT
-3. `ylim(0, 100)` EXTRA JAZZ
-
-This plot shows PERCENTS, not COUNTS. For percents, it is best practice to show the full range of possible percents (0 - 100). Be very careful looking at a graph showing percents that doesn't show you where 0 and 100 are relative to the data shown. If they don't show you that, assume you are being manipulated (or the analyst is a amateur).
-
-If graphing data is your jam (as it should be!), you will enjoy looking through the [R Graph Gallery](https://www.r-graph-gallery.com/index.html). I would be remiss if I didn't casually mention that if you click through on the examples, the code to draw them is right there for you to read/learn from.
-
-
-
-# Some 2020 Data
-
-OK, that data set is cute, but can we get more data, newer data? YES WE CAN! [https://www.fueleconomy.gov/](https://www.fueleconomy.gov/) The US Federal Government publishes annual estimates for the mileage of cars sold in the US each year.
-
-- You do not need to download this data. I did that for you and I added it here.
-- You may, if you are interested, look at the [script I wrote](./data/get_mpg.R).
-- If you want to look yourself, at the bottom of the page, "Download EPA's MPG Ratings"
-
-```{r}
-# Today, we are storing our data in a CSV format.
-mpg2020 <- read_csv("data/mpg2020.csv")
-mpg2020
+```{r echo=FALSE}
+mpg %>%
+    filter(MfrName == "General Motors") %>%
+    kable(caption = "General Motors")
 ```
 
+- One line, one car model sold, but not the number of times sold.
+- Cannot calculate the (Corporate Average Fuel Economy (CAFE))[https://en.wikipedia.org/wiki/Corporate_average_fuel_economy#Calculation]
+
 ```{r}
-## Differences:
-## - I rotated the graph to make the class names easier to read.
-## - The column name used is different.
-## - There are more classes in this data set, so that's neat.
-ggplot(data = mpg2020, aes(y = CarlineClassDesc)) + 
-   geom_bar(aes(x = 100*(..count..)/sum(..count..)), fill = "darkred") +
-   xlim(0, 100)
+ggplot(data = mpg, aes(x = MfrName)) +
+    geom_bar(aes(y = 100 * (..count..) / sum(..count..)), fill = "darkred") +
+    ylim(0, 100) +
+    labs(x = "Manufacturer", y = "Percent") +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
-This data set has everything in the original mpg data, but it is newer and, well, more. But, how can we:
+- This plot aggregates (rolls up) a series of individual rows and GROUPS the results by manufacturer. This is data aggregation.
+    - Most of the "data" you see in the news or on the web have gone through a process of data aggregation (and likely other things as well).
+    - Because this data lacks SALES, a manufacturer with many models looks "big" compared to a manufacturer with a simple model structure, irrespective of sales.
+    - Thus, GM looks huge as does BMW.
+- This code should look familiar  ... although I added a couple of things:
+    - `geom_bar(aes(y = 100 * (..count..) / sum(..count..)), fill = "darkred") +` This calculates percents rather than raw counts.
+    - `ylim(0, 100) +` And this forces R to give us the full percent range.
+    - `theme(axis.text.x = element_text(angle = 45, hjust = 1))` This protects our eyes from too many horizontal labels in a tight place.
+- This plot shows PERCENTS, not COUNTS. For percents, it is best practice to show the full range of possible percents (0 - 100). Be very careful looking at a graph showing percents that doesn't show you where 0 and 100 are relative to the data shown. If they don't show you that, assume you are being manipulated (or the analyst is a amateur).
+- If graphing data is your jam (as it should be!), you will enjoy looking through the [R Graph Gallery](https://www.r-graph-gallery.com/index.html). I would be remiss if I didn't casually mention that if you click through on the examples, the code to draw them is right there for you to read/learn from.
+- Or we could just:
 
-- Draw this plot, for Chevrolets only?
-- Calculate the mileage, for Standard Pick-ups?
-- Figure out which manufacturer has the most models for sale?
-- Figure out who sold the most cars. (Oops, you can't do that with this data!)
+```{r}
+ggplot(data = mpg, aes(x = MfrName)) +
+    geom_bar(aes(y = 100 * (..count..) / sum(..count..)), fill = "darkred") +
+    ylim(0, 100) +
+    labs(x = "Manufacturer", y = "Percent") +
+    coord_flip()
+```
 
-The data needed to answer these AND MANY OTHER questions are here, but we cannot easily do this without first transforming (munging) the data. And this is a real data set and you can imagine real questions that could be answered with it, but to do so, we must be able to transform the data
+In this case, I actually like the sideways text, but that is for purely aesthetic reasons.
 
 
 
-# DATA MUNGING
+# Tonight!
 
 Let me encourage you to read/watch:
 
 - [R4DS: Data Transformation](http://r4ds.had.co.nz/transform.html)
 - [dplyr intro | Data manipulation in R](https://www.youtube.com/watch?v=rm0BQSWoJlc)
 
-We transform data using a series of verbs from the dplyr package (part of the Tidyverse). Each very performs a specific data transformation step.
 
-- Filter: Only keep the rows of data that you need for the analysis. For example, we could use this function to drop all rows not made by Chevrolet.
-    - Function: `filter()`
-    - ==
-    - <, <=, >, >=
-    - is.na()
-    - !
-- Get Summary Stats: Provide summary statistics such as the average value of a column, or the number of lines in the data set.
-    - Function: `summarize()`
-    - min/max
-    - mean/sd
-    - n
-- Group: Group, or stratify our results by a column. This is similar to `facet_wrap()` we learned about last week, but more flexible.
+
+# DATA MUNGING
+
+We transform data using a functions (verbs) from the dplyr package (part of the Tidyverse). Each function performs a specific data transformation.
+
+Data Munging Shorthand:
+
+- `filter()`: Only keep the rows of data that you need for the analysis. For example, we could use this function to drop all rows not made by Chevrolet.
+    - Uses boolean tests to determine which rows to keep:
+        - `==` Two equals means equals. One equals means assign, which will cause an error.
+        - `<`, `<=`, `>`, `>=`
+        - `is.na()` Tests for blank cells.
+        - `!` Not!
+- `summarize()`: Provide summary statistics such as the average value of a column, or the number of lines in the data set.
+    - Relies on helper functions:
+        - `min()`, `max()`
+        - `mean()`, `sd()`
+        - `n()`
+- `group_by()`: Group, or stratify our results by a column. 
+    - This is similar to `facet_wrap()` we learned about last week, but more flexible.
     - Function: `group_by()`
-- Sort: Sort, or arrange, the results by the values in column.
+- `arrange()`: Sort, or arrange, the results by the values in column.
     - Function: `arrange()`
     - By default, returns are sorted in ascending order.
     - `desc()` Returns can be sorted in descending order.
@@ -158,54 +200,59 @@ With their powers combined, we can perform many interesting transformations of o
 
 Uses Boolean logic to filter our data.
 
-- ==
-- <, <=, >, >=
-- is.na()
-- !
+- `==`
+- `<`, `<=`, `>`, `>=`
+- `is.na()`
+- `!`
+
+### How many car models were made by Chevrolet in 2020?
 
 ```{r}
-chevies <- filter(mpg2020, Division == "Chevrolet")
-chevies
+## Data contains ONLY 2020 cars, so we don't have to filter by model year.
+## Chevrolet is a "Division" of General Motors, so we have to filter that.
+## We have to identify what data set we want to filter AND
+## we have to tell R what Boolean test we want to use.
+filter(mpg, Division == "Chevrolet")
 ```
 
 In case you didn't realize this, General Motors owns/manufacturers Chevrolet and several car brands such as Cadillac & GMC.
 
+- `Division` is a character column, so ONLY "==" makes any sense here.
+- This wouldn't mean anything: `Division > "Chevrolet"`
+    - Other than to point out how bad Chevies are.
+
+### How many four cylinder model cars were made in 2020?
+
 ```{r}
-paste("Number Rows mpg2020:", nrow(mpg2020))
-paste("Number Rows chevies:", nrow(chevies))
+## Notice how mpg is the first parameter.
+filter(mpg, NCyl == 4)
 ```
 
-We can look at cars with 4 cylinders.
+### How many car models were made with fewer than 6 cylinders?
 
 ```{r}
-four_cylinders <- filter(mpg2020, NCyl == 4)
-four_cylinders
-```
-
-Or cars with less than 6 cylinders!
-
-```{r}
-lt_six_cylinders <- filter(mpg2020, NCyl < 6)
-lt_six_cylinders
+filter(mpg, NCyl < 6)
 ```
 
 In case you didn't realize this, there many different kinds of Honda Civic. We can find them all without having to know the `Carline` name for each!
 
 ```{r}
-civics <- filter(mpg2020, str_detect(Carline, "CIVIC"))
-civics
+## This creates a new data set!
+civics <- filter(mpg, str_detect(Carline, "CIVIC"))
 ```
 
-And, this isn't just academic. Perhaps I want to see a density plot of Honda Civic city gas mileage.
+Compare the city gas mileage of Civics to the rest of the cars.
 
 ```{r}
-ggplot(civics, aes(x = City)) + geom_density(color = "darkgreen") 
-```
+## It is OK to put two (or more) plots, etc. in a single code chunk.
 
-This differs from the over-all dramatically!
+## The distribution of city mileage for civics.
+ggplot(civics, aes(x = City)) +
+    geom_density(color = "darkgreen")
 
-```{r}
-ggplot(mpg2020, aes(x = City)) + geom_density(color = "darkred") 
+## The distribution of city mileage for all.
+ggplot(mpg, aes(x = City)) +
+    geom_density(color = "darkred")
 ```
 
 Some takeaways:
@@ -214,25 +261,39 @@ Some takeaways:
 2. PLEASE observer how these two graphs peak in very different places!
 3. The first parameter in the filter command AND the ggplot command is data.
 4. While this data does not allow us to control for the number of units shipped, it is still sobering to see that the average city gas mileage of cars sold in the US in 2020 was just less than 20 mpg. This is only marginally higher than the mileage on my 2013 Nissan Xterra.
+5. The first function parameter in EVERY function we have used today has been a data set.
 
 ## Summarize
 
-- Function: `summarize()`
-- min/max
-- mean/sd
-- n
-- Yes, there are other commands which are sometimes useful, but this is most of what you really need.
+Creates aggregate statistics, like a bar plot does, of a data set.
+
+Uses helper functions to operate.
+
+- `min()`, `max()`
+- `mean()`, `sd()`
+- `n()`
 
 A summary statistic, hence summarize, is a single number that tells us something about the data in that column.
 
+And we can see how this plays out when we run some summary statistics on the `civics` and `mpg` data sets.
+
 ```{r}
 summarize(
-  civics,
-  N = n(),
-  CityAvg = mean(City),
-  CitySD = sd(City),
-  CityMin = min(City),
-  CityMax = max(City)
+    civics,
+    N = n(),
+    CityAvg = mean(City),
+    CitySD = sd(City),
+    CityMin = min(City),
+    CityMax = max(City)
+)
+
+summarize(
+    mpg,
+    N = n(),
+    CityAvg = mean(City),
+    CitySD = sd(City),
+    CityMin = min(City),
+    CityMax = max(City)
 )
 ```
 
@@ -240,25 +301,26 @@ Does this make sense, in the context of our data set and density plot above?
 
 ## Group By
 
-Stratify the results of a summarize by another variable. Every year, this gives students a hard time. So here's an example I hope helps.
+Stratifies the results of a summarize. This is like `facet_wrap()`.
 
 - Function: `group_by()`
+- That underscore is important. The function is not `group by()`!!!
 
 ```{r}
 grouped_civics <- group_by(civics, Carline)
 summarize(grouped_civics,
-          N = n(),
-          CityAvg = mean(City),
-          CitySD = sd(City),
-          CityMin = min(City),
-          CityMax = max(City))
+    N = n(),
+    CityAvg = mean(City),
+    CitySD = sd(City),
+    CityMin = min(City),
+    CityMax = max(City)
+)
 ```
 
-There's a five-door Civic?
-
-- The function `group_by` creates a grouped data set which is nearly indistinguishable from an un-grouped data set.
+- There's a five-door Civic?
+- The function `group_by` creates a grouped data set which is visually indistinguishable from an un-grouped data set.
 - This command is not useful on it's own.
-- It is very useful when combined with summarize because a grouped data set summarizes differently than an un-grouped data set.
+- However, a grouped data set summarizes differently than it otherwise would.
 - Again, notice how the data set is ALWAYS the first parameter.
     - There must be some reason I keep harping on this. . . .
   
@@ -267,33 +329,99 @@ There's a five-door Civic?
 ## Groups: Carline [3]
 grouped_civics
 ```
-  
-As you can probably imagine, if you do this a bunch, you wind up with a bunch of awkwardly named data sets. I've got six or seven going now, and I'm just messing around. Fortunately, there is a better way! Pipes! (`%>%`)
+
+In truth, `group_by()` is a convenience function. We could, if we wanted write:
 
 ```{r}
+## This just concatenates the results together into a single tibble.
+bind_rows(
+    ## This is where the real action is at.
+    ## I'm doing the SAME calculation three times!
+    ## This is hard to read and hard to maintain.
+    summarize(
+        filter(civics, Carline == "CIVIC 2DR"),
+        N = n(),
+        CityAvg = mean(City),
+        CitySD = sd(City),
+        CityMin = min(City),
+        CityMax = max(City)
+    ),
+    summarize(
+        filter(civics, Carline == "CIVIC 4Dr"),
+        N = n(),
+        CityAvg = mean(City),
+        CitySD = sd(City),
+        CityMin = min(City),
+        CityMax = max(City)
+    ),
+    summarize(
+        filter(civics, Carline == "CIVIC 5DR"),
+        N = n(),
+        CityAvg = mean(City),
+        CitySD = sd(City),
+        CityMin = min(City),
+        CityMax = max(City)
+    )
+)
+```
+
+And now, I hope, you can better understand why `group_by()`, like `facet_wrap()`, exists. It doesn't do anything _new_, it just does it more easily.
+
+## THE PIPE
+
+Look back at that code above. It was nested. I had a `filter()` inside a `summarize()` inside a `bind_rows()`. It was hard to read.
+
+Pipes (`%>%`) offer a better way!
+
+```{r}
+## Replaces an explicit assignment of data, with an implicit assignment of data.
+## The next two code chunks do the same thing.
+
+## When using a pipe, the result set from the previous function is called ".".
+## This is a convention. It could have been Bob, but it is called ".".
 civics %>%
-   group_by(Carline) %>%
-   summarize(
-          N = n(),
-          CityAvg = mean(City),
-          CitySD = sd(City),
-          CityMin = min(City),
-          CityMax = max(City))
+    group_by(.data = ., Carline) %>%
+    summarize(
+        .data = .,
+        N = n(),
+        CityAvg = mean(City),
+        CitySD = sd(City),
+        CityMin = min(City),
+        CityMax = max(City)
+    )
+
+## Instead of assigning the value of .data explicitly, it is implicit.
+civics %>%
+    group_by(Carline) %>%
+    summarize(
+        N = n(),
+        CityAvg = mean(City),
+        CitySD = sd(City),
+        CityMin = min(City),
+        CityMax = max(City)
+    )
 ```
 
 This is EXACTLY the same as what we did above, but we did it in a single step. The pipe symbol `%>%` sends the output from one function to the input of the next function and works when the first parameter of the function is the data. That's why I kept pointing this out. We can do all sorts of piping!
 
+
+### Using pipes, calculate the mean, sd, min, and max values of City mileage for Honda Civics.
+
+- Worst title of the lecture goes to . . . .
+
 ```{r}
-easy_summary_civics <- 
-   mpg2020 %>%
-   filter(str_detect(Carline, "CIVIC")) %>%
-   group_by(Carline) %>%
-   summarize(
-          N = n(),
-          CityAvg = mean(City),
-          CitySD = sd(City),
-          CityMin = min(City),
-          CityMax = max(City))
+easy_summary_civics <-
+    mpg %>%
+    filter(str_detect(Carline, "CIVIC")) %>%
+    group_by(Carline) %>%
+    summarize(
+        N = n(),
+        CityAvg = mean(City),
+        CitySD = sd(City),
+        CityMin = min(City),
+        CityMax = max(City)
+    )
+
 easy_summary_civics
 ```
 
@@ -301,7 +429,7 @@ Thanks to the pipe operator (`%>%`), we can avoid creating a million data-step d
 
 ## Arrange
 
-After performing one or more data transformations, R will return our data to us in alphabetical order, based on the first column or so. For example, see above.
+After performing one or more data transformations, R will return our data to us in alphabetical order, based on the first column. For example, see above.
 
 But, that isn't ALWAYS how we want it.
 
@@ -316,15 +444,32 @@ easy_summary_civics %>% arrange(desc(CityAvg))
 
 This function is a useful function on your labs!!!!!! For example, say I ask a question like this:
 
-> Task X: Which Car in mpg2020 has the HIGHEST highway gas mileage?
+> Task X: Which Car in mpg has the HIGHEST highway gas mileage?
 
-So, there are over 1,000 rows in mpg2020. I don't think you want to go searching through that by hand. In fact, I KNOW you don't. (If you do, let's talk after class.) Fortunately, arrange makes it easy.
+So, there are over 1,000 rows in mpg. I don't think you want to go searching through that by hand. In fact, I KNOW you don't. (If you do, let's talk after class.) Fortunately, arrange makes it easy.
 
 ```{r}
-mpg2020 %>% arrange(desc(Hwy))
+mpg %>% arrange(desc(Hwy))
 ```
 
-## And we can combine our graphics and our pipes!
+## Combine ggplot and dplyr!
+
+Task: What is the percent of cars by car class (`CarlineClassDesc`). Using this, what is the most common car class in this data set?
+
+```{r}
+mpg %>%
+    group_by(CarlineClassDesc) %>%
+    summarize(n = n()) %>%
+    ## And this is how we calculate
+    mutate(p = 100 * n / sum(n)) %>%
+    ## arrange(desc(p)) %>%
+    ggplot(aes(x = p, y = CarlineClassDesc)) +
+    ## Don't use geom_col b/c of the grain of the data coming into ggplot.
+    geom_col(fill = "darkred") +
+    ## Please note what I did here. I capped the plot at 25%.
+    xlim(0, 25) +
+    labs(title = "The greatest plot in history", x = "Percent", y = "Car Class")
+```
 
 There's a lot going on here, but you've seen ALMOST all of it before.
 
@@ -335,17 +480,6 @@ There's a lot going on here, but you've seen ALMOST all of it before.
     - Data Transformations: `%>%` (Pass it along this way >)
     - Data Viz: `+` (Add another layer)
 
-SEE IT IN ACTION!!!
-
-```{r}
-mpg2020 %>%
-  group_by(CarlineClassDesc) %>%
-  summarize(n = n())  %>%
-  mutate(p = 100*n/sum(n)) %>%
-  ggplot(aes(x = p, y = CarlineClassDesc)) + 
-  geom_col(fill = "darkred") +
-  xlim(0, 100)
-```
 
 R is a dizzying array of small, simple functions which work together in untold patterns. This ability to weave new patterns out of existing functions is called functional composition and it is a key to learning and eventually mastering modern R programming.
 
