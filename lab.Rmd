@@ -262,3 +262,6 @@ Soon we will start thinking about building a linear model to predict Airbnb host
 
 ```
 
+# Next steps
+
+Repetition is the key to learning this stuff. We are going to spend couple of weeks doing this over and over and over again.
