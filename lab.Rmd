@@ -243,19 +243,23 @@ STRETCH: Can you think of another way to answer this question that would not rel
 ```
 
 
-## Task 13. Is this a large enough sample to be useful?
+## Task 13. Useful?
 
-Nothing to code here.
+- Question: Is this a large enough sample to be useful?
+- Answer: 
+
+
+Nothing to code here. This is a thinking out loud question.
 
 All else being equal, a data scientist would rather have more than less data available. But, collecting data isn't free and takes time. Do you think we have enough data about the price of "Shared Rooms" to properly estimate it's cost in NYC?
 
 
 ## Task 14. Predicting Price
 
-- Question: 
+- Question: Which features (columns) do you think would be most useful for predicting price?
 - Answer: 
 
-Soon we will start thinking about building a linear model to predict Airbnb host price in NYC. Use your transformation/plotting skills to look at the data. Which features (columns) do you think would be most useful for predicting price? Describe what you find in Canvas. You can choose to use data transformation(s), plot(s), or a combination of both. Feel free to create additional code chunks if that is helpful to you.
+Soon we will start thinking about building a linear model to predict Airbnb host price in NYC. Use your transformation/plotting skills to look at the data. Describe what you find in Canvas. You can choose to use data transformation(s), plot(s), or a combination of both. Feel free to create additional code chunks if that is helpful to you.
 
 ```{r}
 ## YOUR CODE HERE!
