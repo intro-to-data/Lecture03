@@ -51,7 +51,7 @@ abnb <- read_csv(data_file)
 
 # Lab
 
-If you are coming back in, be sure to run setup before attempting to work on the tasks below.
+If you are coming back in, run `setup` before working on the tasks below.
 
 ## Data
 
