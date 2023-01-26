@@ -189,28 +189,14 @@ Let me encourage you to read/watch:
 
 # DATA MUNGING
 
-We transform data using a functions (verbs) from the dplyr package (part of the Tidyverse). Each function performs a specific data transformation.
+We transform data using functions (verbs) from the dplyr package (part of the Tidyverse). Each function performs a specific data transformation.
 
-Data Munging Shorthand:
+Verbs:
 
 - `filter()`: Only keep the rows of data that you need for the analysis. For example, we could use this function to drop all rows not made by Chevrolet.
-    - Uses boolean tests to determine which rows to keep:
-        - `==` Two equals means equals. One equals means assign, which will cause an error.
-        - `<`, `<=`, `>`, `>=`
-        - `is.na()` Tests for blank cells.
-        - `!` Not!
 - `summarize()`: Provide summary statistics such as the average value of a column, or the number of lines in the data set.
-    - Relies on helper functions:
-        - `min()`, `max()`
-        - `mean()`, `sd()`
-        - `n()`
 - `group_by()`: Group, or stratify our results by a column. 
-    - This is similar to `facet_wrap()` we learned about last week, but more flexible.
-    - Function: `group_by()`
 - `arrange()`: Sort, or arrange, the results by the values in column.
-    - Function: `arrange()`
-    - By default, returns are sorted in ascending order.
-    - `desc()` Returns can be sorted in descending order.
 
 ```{r}
 url <- "https://upload.wikimedia.org/wikipedia/en/b/bd/ThePlaneteers.JPG"
