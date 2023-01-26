@@ -33,9 +33,6 @@ knitr::include_graphics(url)
 
 - Last week, an introduction to data viz.
 - This week, an introduction data munging (Tidy/Transform) & some data viz.
-- Next week, more data viz and more data munging.
-    - And a quiz (I am going to remove the lab and replace it with a quiz.)
-    - I did not feel it was fair to judge you for a class merely on a midterm, final, and a couple of homework assignments.
 
 **BIG IDEA:** The data you have is ALMOST NEVER the data you want.
 
@@ -53,7 +50,6 @@ knitr::include_graphics(url)
 
 ```{r setup, message=FALSE, warning=FALSE}
 ## Experiment with what happens if you set message to TRUE.
-rm(list = ls())
 library(knitr)
 library(tidyverse)
 mpg <- read_csv("data/mpg2020.csv")
@@ -67,21 +63,13 @@ Different ways to review the data:
 
 The first two options keep the data view in the notebook. The last option separates the data view from the notebook which reduces the value of the notebook as a stand-alone document. But, it is very flexible/useful.
 
-## As a table
+## Inline (Notebook)
 ```{r}
 ## This gets awkward for wide data sets.
 mpg
 ```
 
-## Via glimpse
-
-```{r}
-## This doesn't show as much, but scales better for wide data sets.
-## In this case, it is quite helpful.
-glimpse(mpg)
-```
-
-## View in RStudio
+## Separate Tab
 
 ```{r}
 ## Uppercase "V" here is important!
@@ -111,17 +99,50 @@ knitr::include_graphics(file)
     - This data tells us something about the mileage of car models for sale.
     - It tells us nothing about the mileage of cars actually sold.
     - It tells us nothing, really, of mileage of cars on the road.
+    - [2020 Truck, SUV, Car Sales: Winners And Losers](https://www.forbes.com/wheels/news/2020-truck-suv-car-sales-winners-and-losers)
     
 For example:
 
 ```{r echo=FALSE}
-mpg %>%
-    filter(MfrName == "General Motors") %>%
+mpg |>
+    filter(MfrName == "General Motors") |>
     kable(caption = "General Motors")
 ```
 
 - One line, one car model sold, but not the number of times sold.
 - Cannot calculate the (Corporate Average Fuel Economy (CAFE))[https://en.wikipedia.org/wiki/Corporate_average_fuel_economy#Calculation]
+
+
+To have a functional `ggplot` you need TWO commands:
+
+- ggplot
+- geom_*
+
+Below, is a SIMPLE example. Using this week's data, this plot shows that there is a pretty strong correlation between "City" and "Highway" gas mileage.
+
+```{r}
+ggplot(data = mpg, aes(x = City, y = Hwy)) +
+    geom_point()
+```
+
+- Above, we can see that if we have two commands, we get a plot.
+- But not all plots are so simple.
+- The graph below shows us HOW MANY cars there are in our data set, per manufacturer.
+    - This has NOTHING to do with how many cars are actually SOLD.
+    - In 2020 Ford and Toyota each sold NEARLY two million cars each.
+    - Chevrolet and Honda each sold more than one million cars each.
+    - GMC sold a little over 500K.
+    - Again, this is where UNDERSTANDING THE GRAIN is important.
+
+```{r}
+ggplot(data = mpg, aes(x = MfrName)) +
+    geom_bar(fill = "darkred") +
+    labs(x = "Manufacturer", y = "Count") +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+- What if we want to show percents instead of raw numbers? 
+- Well, one way to do so . . . . 
 
 ```{r}
 ggplot(data = mpg, aes(x = MfrName)) +
@@ -132,9 +153,6 @@ ggplot(data = mpg, aes(x = MfrName)) +
 ```
 
 - This plot aggregates (rolls up) a series of individual rows and GROUPS the results by manufacturer. This is data aggregation.
-    - Most of the "data" you see in the news or on the web have gone through a process of data aggregation (and likely other things as well).
-    - Because this data lacks SALES, a manufacturer with many models looks "big" compared to a manufacturer with a simple model structure, irrespective of sales.
-    - Thus, GM looks huge as does BMW.
 - This code should look familiar  ... although I added a couple of things:
     - `geom_bar(aes(y = 100 * (..count..) / sum(..count..)), fill = "darkred") +` This calculates percents rather than raw counts.
     - `ylim(0, 100) +` And this forces R to give us the full percent range.
@@ -156,6 +174,8 @@ In this case, I actually like the sideways text, but that is for purely aestheti
 
 
 # Tonight!
+
+We _are_ going to introduce a lof of new ideas.
 
 Let me encourage you to read/watch:
 
@@ -371,7 +391,7 @@ And now, I hope, you can better understand why `group_by()`, like `facet_wrap()`
 
 Look back at that code above. It was nested. I had a `filter()` inside a `summarize()` inside a `bind_rows()`. It was hard to read.
 
-Pipes (`%>%`) offer a better way!
+Pipes (`|>`) offer a better way!
 
 ```{r}
 ## Replaces an explicit assignment of data, with an implicit assignment of data.
@@ -379,8 +399,8 @@ Pipes (`%>%`) offer a better way!
 
 ## When using a pipe, the result set from the previous function is called ".".
 ## This is a convention. It could have been Bob, but it is called ".".
-civics %>%
-    group_by(.data = ., Carline) %>%
+civics |>
+    group_by(.data = ., Carline) |>
     summarize(
         .data = .,
         N = n(),
@@ -391,8 +411,8 @@ civics %>%
     )
 
 ## Instead of assigning the value of .data explicitly, it is implicit.
-civics %>%
-    group_by(Carline) %>%
+civics |>
+    group_by(Carline) |>
     summarize(
         N = n(),
         CityAvg = mean(City),
@@ -402,8 +422,13 @@ civics %>%
     )
 ```
 
-This is EXACTLY the same as what we did above, but we did it in a single step. The pipe symbol `%>%` sends the output from one function to the input of the next function and works when the first parameter of the function is the data. That's why I kept pointing this out. We can do all sorts of piping!
+This is EXACTLY the same as what we did above, but we did it in a single step. The pipe symbol `|>` sends the output from one function to the input of the next function and works when the first parameter of the function is the data. That's why I kept pointing this out. We can do all sorts of piping!
 
+If you see me type: `%>%`:
+
+  - `|>` is the new R pipe.
+  - If I ever use `%>%`, it is basically the same thing. 
+  - The only difference is that `|>` is part part of base R and `%>%` is part of a package. But the idea proved to be so popular they decided requiring a package for a pipe ought not be necessary.
 
 ### Using pipes, calculate the mean, sd, min, and max values of City mileage for Honda Civics.
 
@@ -411,9 +436,9 @@ This is EXACTLY the same as what we did above, but we did it in a single step. T
 
 ```{r}
 easy_summary_civics <-
-    mpg %>%
-    filter(str_detect(Carline, "CIVIC")) %>%
-    group_by(Carline) %>%
+    mpg |>
+    filter(str_detect(Carline, "CIVIC")) |>
+    group_by(Carline) |>
     summarize(
         N = n(),
         CityAvg = mean(City),
@@ -425,7 +450,7 @@ easy_summary_civics <-
 easy_summary_civics
 ```
 
-Thanks to the pipe operator (`%>%`), we can avoid creating a million data-step data sets. This is kinda-sorta available in SAS, but it is not taught as a best practice. In modern R programming, using the pipe is considered best practice and is how this stuff gets taught.
+Thanks to the pipe operator (`|>`), we can avoid creating a million data-step data sets. This is kinda-sorta available in SAS, but it is not taught as a best practice. In modern R programming, using the pipe is considered best practice and is how this stuff gets taught.
 
 ## Arrange
 
@@ -438,8 +463,8 @@ But, that isn't ALWAYS how we want it.
 - `desc()` Returns can be sorted in descending order.
 
 ```{r}
-easy_summary_civics %>% arrange(CityAvg)
-easy_summary_civics %>% arrange(desc(CityAvg))
+easy_summary_civics |> arrange(CityAvg)
+easy_summary_civics |> arrange(desc(CityAvg))
 ```
 
 This function is a useful function on your labs!!!!!! For example, say I ask a question like this:
@@ -449,7 +474,7 @@ This function is a useful function on your labs!!!!!! For example, say I ask a q
 So, there are over 1,000 rows in mpg. I don't think you want to go searching through that by hand. In fact, I KNOW you don't. (If you do, let's talk after class.) Fortunately, arrange makes it easy.
 
 ```{r}
-mpg %>% arrange(desc(Hwy))
+mpg |> arrange(desc(Hwy))
 ```
 
 ## Combine ggplot and dplyr!
@@ -457,12 +482,12 @@ mpg %>% arrange(desc(Hwy))
 Task: What is the percent of cars by car class (`CarlineClassDesc`). Using this, what is the most common car class in this data set?
 
 ```{r}
-mpg %>%
-    group_by(CarlineClassDesc) %>%
-    summarize(n = n()) %>%
+mpg |>
+    group_by(CarlineClassDesc) |>
+    summarize(n = n()) |>
     ## And this is how we calculate
-    mutate(p = 100 * n / sum(n)) %>%
-    ## arrange(desc(p)) %>%
+    mutate(p = 100 * n / sum(n)) |>
+    ## arrange(desc(p)) |>
     ggplot(aes(x = p, y = CarlineClassDesc)) +
     ## Don't use geom_col b/c of the grain of the data coming into ggplot.
     geom_col(fill = "darkred") +
@@ -477,7 +502,7 @@ There's a lot going on here, but you've seen ALMOST all of it before.
 2. We use `geom_col` rather than `geom_barm` because I am providing the in the table.
 3. With each step, we pass the results along the pipe. And at the end of the pipe, we get a plot.
 4. THERE ARE TWO PIPES (sorta)
-    - Data Transformations: `%>%` (Pass it along this way >)
+    - Data Transformations: `|>` (Pass it along this way >)
     - Data Viz: `+` (Add another layer)
 
 

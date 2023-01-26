@@ -129,11 +129,11 @@ Task: Use the dplyr verbs we learned this evening to answer the question. Replac
 ```{r}
 ## Two different solutions!
 
-abnb %>%
-    group_by(?) %>%
+abnb |>
+    group_by(?) |>
     summarize(?)
 
-abnb %>%
+abnb |>
     count(?)
 ```
 
