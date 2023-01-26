@@ -29,7 +29,13 @@ Optional Functions (layers)
         - `<`, `<=`, `>`, `>=`
         - `is.na()` Tests for blank cells.
         - `!` Not!
+- `mutate()`: Creates NEW columns!
+    - For EACH row in the data, you will have an new cell of data.
+    - So if you data set has 100 rows, mutate will return 100 new values.
+    - There are sooooo many things you can do with this function.
 - `summarize()`: Provide summary statistics such as the average value of a column, or the number of lines in the data set.
+    - Unless grouped, this returns ONE row of data no matter how many rows of data are in your data set.
+    - If grouped, this function returns ONE row of data for EACH UNIQUE value of the column(s) you are grouping by.
     - Relies on helper functions:
         - `min()`, `max()`
         - `mean()`, `sd()`

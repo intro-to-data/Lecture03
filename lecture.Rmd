@@ -492,7 +492,7 @@ mpg |>
 There's a lot going on here, but you've seen ALMOST all of it before.
 
 1. We transform the data. Note how I am calculating both N counts and percentages.
-2. We use `geom_col` rather than `geom_barm` because I am providing the in the table.
+2. We use `geom_col` rather than `geom_barm`.
 3. With each step, we pass the results along the pipe. And at the end of the pipe, we get a plot.
 4. THERE ARE TWO PIPES (sorta)
     - Data Transformations: `|>` (Pass it along this way >)
