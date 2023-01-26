@@ -35,12 +35,10 @@ This is especially important in a lab such as tonight's because we are going to 
 
 ```{r setup, message=FALSE, warning=FALSE}
 ## This is here for folks who don't reset the R session.
-rm(list = ls())
-
 library(knitr)
+library(rio)
 library(tidyverse)
-data_file <- "./data/new-york-city-airbnb-open-data.zip"
-abnb <- read_csv(data_file)
+abnb <- import("./data/new-york-city-airbnb-open-data.zip")
 ```
 
 - The data for this lab is stored in a CSV file.

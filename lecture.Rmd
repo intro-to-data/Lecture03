@@ -51,8 +51,9 @@ knitr::include_graphics(url)
 ```{r setup, message=FALSE, warning=FALSE}
 ## Experiment with what happens if you set message to TRUE.
 library(knitr)
+library(rio)
 library(tidyverse)
-mpg <- read_csv("data/mpg2020.csv")
+mpg <- import("data/mpg2020.csv")
 ```
 
 Different ways to review the data:

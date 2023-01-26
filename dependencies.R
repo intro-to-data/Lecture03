@@ -2,7 +2,10 @@
 
 p <- c(
     "knitr",
+    "markdown",
+    "rio",
     "rmarkdown",
+    "shiny",
     "tidyverse"
 )
 install.packages(p)
