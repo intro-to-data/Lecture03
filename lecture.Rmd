@@ -16,11 +16,13 @@ output:
 
 # Tonight
 
-- Data Life Cycle
-- Last Week Tonight
+- Lecture 01:
+  - Data Life Cycle
+  - Last Week Tonight
     - Some `mpg` talk
     - A ggplot review
-- Intro To Data Munging
+- Lecture 02:
+  - Intro To Data Munging
 
 
 
