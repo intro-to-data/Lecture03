@@ -205,6 +205,10 @@ knitr::include_graphics(url)
 
 With their powers combined, we can perform many interesting transformations of our data, to answer questions the original data cannot answer. We will learn about other data transformations in the coming weeks. This is enough to get us started doing something interesting.
 
+**BIG IDEA:** The data you have is ALMOST NEVER the data you want.
+
+TLDR: [hints](hints.Rmd)
+
 ## Filter
 
 Uses Boolean logic to filter our data.
