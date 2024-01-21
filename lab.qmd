@@ -2,7 +2,10 @@
 title: "Munge"
 author: "YOUR NAME HERE"
 date: "Week 03"
-output: html_notebook
+editor:
+  markdown:
+    wrap: 72
+format: html
 ---  
 
 
@@ -33,7 +36,7 @@ knitr::include_graphics(url)
 
 This is especially important in a lab such as tonight's because we are going to use a different data set for the lab.
 
-```{r setup, message=FALSE, warning=FALSE}
+```{r setup}
 ## This is here for folks who don't reset the R session.
 library(knitr)
 library(rio)
@@ -101,12 +104,12 @@ You can solve Task 02 without writing any code.
 - If you want to read more about data graininess, [Data Granularity](https://en.wikipedia.org/wiki/Granularity#Data_granularity)
 
 
-## Task 04. Number of Airbnb hosts per `neighbourhood_group`. 
+## Task 04. Number of B&Bs are there per `neighbourhood_group`. 
 
-- Question: Which neighborhood has the most hosts?
+- Question: Which neighborhood has the most B&Bs?
 - Answer:
 
-Task: Draw a bar plot showing the number of Airbnb hosts per `neighbourhood_group` to answer the question.
+Task: Draw a bar plot showing the number of B&Bs per `neighbourhood_group` to answer the question.
 
 ```{r}
 ## YOUR ANSWER HERE!
@@ -114,9 +117,9 @@ Task: Draw a bar plot showing the number of Airbnb hosts per `neighbourhood_grou
 ```
 
 
-## Task 05. How many hosts are in Queens?
+## Task 05. How many B&Bs are in Queens?
 
-- Question: How many hosts are in Queens?
+- Question: How many B&Bs are in Queens?
 - Answer: 
 
 Task: Use the dplyr verbs we learned this evening to answer the question. Replace my question marks with code to find the answer.
