@@ -18,6 +18,9 @@ This lab is based on the New York City Airbnb Open Data from Kaggle. I want you 
 - Guided EDA [EDA](https://r4ds.had.co.nz/exploratory-data-analysis.html)
 
 ```{r}
+#| fig-align: 'center'
+#| fig-width: '75%'
+
 url <- "https://imgs.xkcd.com/comics/realistic_criteria.png"
 knitr::include_graphics(url)
 ```
@@ -38,6 +41,7 @@ This is especially important in a lab such as tonight's because we are going to 
 
 ```{r}
 #| label: setup
+#| warning: false
 library(knitr)
 library(rio)
 library(tidyverse)
@@ -76,7 +80,9 @@ knitr::include_graphics(url)
 
 ```{r}
 ## YOUR CODE HERE!!!
+dim(abnb)
 
+# OR JUST USE THE GUI
 ```
 
 You can solve Task 01 without writing any code.
@@ -89,7 +95,9 @@ You can solve Task 01 without writing any code.
 
 ```{r}
 ## YOUR CODE HERE!!!
+dim(abnb)
 
+# OR JUST USE THE GUI
 ```
 
 You can solve Task 02 without writing any code.
@@ -98,7 +106,7 @@ You can solve Task 02 without writing any code.
 ## Task 03. What is the grain of this Airbnb data?
 
 - Question: What is the grain of the `abnb` data?
-- Answer: 
+- Answer: AirBNBs in New York City
 
  To define the "grain" think about what makes each row unique? If you count all the rows of data, what is it you have counted? You should be able to write this out in just a couple of sentences.
 
@@ -116,14 +124,14 @@ Task: Draw a bar plot showing the number of B&Bs per `neighbourhood_group` to an
 
 ```{r}
 ## YOUR ANSWER HERE!
-
+abnb |> count(neighbourhood_group)
 ```
 
 
 ## Task 05. How many B&Bs are in Queens?
 
 - Question: How many B&Bs are in Queens?
-- Answer: 
+- Answer: 5,666
 
 Task: Use the dplyr verbs we learned this evening to answer the question. Replace my question marks with code to find the answer.
 
@@ -132,42 +140,49 @@ Task: Use the dplyr verbs we learned this evening to answer the question. Replac
 
 ```{r}
 ## Three solutions!
-abnb |> filter(neighbourhood_group == ?)
+abnb |> filter(neighbourhood_group == "Queens")
 
 abnb |>
-    group_by(?) |>
-    summarize(?)
+    group_by(neighbourhood_group) |>
+    summarize(n = n())
 
 abnb |>
-    count(?)
-
-
+    count(neighbourhood_group)
 ```
 
 - Question: In what way is `count()` less useful than `summarize()`?
-- Answer: 
+- Answer: It is less flexible. Summarize can do many things, like add columns, find the average, etc. Count only counts things.
 
 
 ## Task 06. Room types in the Bronx?
 
 - Question: What type of room is most common in the Bronx?
-- Answer: 
+- Answer: Private roon
 
 Which way would you prefer to solve this? `dplyr` or `ggplot`
 
 ```{r}
 ## YOUR CODE HERE!
-
+abnb |>
+  filter(neighbourhood_group == "Bronx") |>
+  count(room_type)
 ```
 
 
 ## Task 07. Room price in Belmont?
 
 - Question: What is the average price of a room in Belmont?
-- Answer: 
+- Answer: 77.125 
 
 ```{r}
 ## YOUR CODE HERE!
+abnb |>
+  filter(neighbourhood == "Belmont") |>
+  summarize(avg_price = mean(price))
+
+abnb |>
+  filter(neighbourhood == "Belmont", room_type == "Private room") |>
+  summarize(avg_price = mean(price))
 
 ```
 
@@ -181,7 +196,9 @@ Task: Create a scatter plot showing the relationship between the two variables. 
 
 ```{r}
 ## YOUR CODE HERE!
-
+abnb |> 
+  ggplot(aes(x = number_of_reviews, y = price)) +
+  geom_point()
 ```
 
 
@@ -198,7 +215,9 @@ Task: Draw a density plot of host price and upload it to Canvas.
 
 ```{r}
 ## YOUR CODE HERE!
-
+abnb |>
+  ggplot(aes(x = price)) |>
+  geom_density()
 ```
 
 To download your plot, right click on the image and download it to your local computer so you can upload it to Canvas.
@@ -217,14 +236,18 @@ To answer this question, you can use a box plot (`geom_boxplot()`). If you'd lik
 
 ```{r}
 ## YOUR CODE HERE!
-
+abnb |>
+  ggplot(aes(x = room_type, y = price)) +
+  geom_boxplot()
 ```
 
 STRETCH: Can you think of another way to answer this question that would not rely on a box plot?
 
 ```{r}
 ## YOUR CODE HERE!
-
+abnb |>
+  ggplot(aes(x = price)) |>
+  geom_point()
 ```
 
 
@@ -235,18 +258,29 @@ STRETCH: Can you think of another way to answer this question that would not rel
 
 ```{r}
 ## YOUR CODE HERE!
+abnb |>
+  filter(room_type == "Shared room") |>
+  summarize(avg_price == mean(price))
 
+abnb |>
+  group_by(room_type) |>
+  summarize(avg_price = mean(price))
 ```
 
 
 ## Task 12. Shared room count
 
 - Question: How many "Shared room" entries are in the data?
-- Answer: 
+- Answer: 1,160 
 
 ```{r}
 ## YOUR CODE HERE!
+abnb |>
+  filter(room_type == "Shared room")
 
+abnb |>
+  group_by(room_type) |>
+  summarize(n = n())
 ```
 
 
@@ -264,14 +298,9 @@ All else being equal, a data scientist would rather have more than less data ava
 ## Task 14. Predicting Price
 
 - Question: Which features (columns) do you think would be most useful for predicting price?
-- Answer: 
+- Answer: Their answer depends on how well the support it. 
 
 Soon we will start thinking about building a linear model to predict Airbnb host price in NYC. Use your transformation/plotting skills to look at the data. Describe what you find in Canvas. You can choose to use data transformation(s), plot(s), or a combination of both. Feel free to create additional code chunks if that is helpful to you.
-
-```{r}
-## YOUR CODE HERE!
-
-```
 
 # Next steps
 

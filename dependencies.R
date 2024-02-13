@@ -10,5 +10,4 @@ p <- c(
 )
 install.packages(p)
 
-
-unlink("class_survey_answers.qmd")
+unlink("lab-answers.qmd")
